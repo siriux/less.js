@@ -19,6 +19,7 @@ VERSION = `cat package.json | grep version \
 														| grep -o '[0-9]\.[0-9]\.[0-9]\+'`
 DIST = dist/less-${VERSION}.js
 RHINO = dist/less-rhino-${VERSION}.js
+NODE = dist/less-node-${VERSION}.js
 DIST_MIN = dist/less-${VERSION}.min.js
 
 less:
@@ -34,9 +35,24 @@ less:
 	      ${SRC}/tree/*.js\
 	      ${SRC}/tree.js\
 	      ${SRC}/browser.js\
-	      build/amd.js >> ${DIST}
+	      build/amd-anon.js >> ${DIST}
 	@@echo "})(window);" >> ${DIST}
 	@@echo ${DIST} built.
+
+node:
+	@@mkdir -p dist
+	@@touch ${NODE}
+	@@cat ${HEADER} | sed s/@VERSION/${VERSION}/ > ${NODE}
+	@@echo "(function () {" >> ${NODE}
+	@@cat build/require-node.js\
+	      ${SRC}/parser.js\
+	      ${SRC}/functions.js\
+	      ${SRC}/colors.js\
+	      ${SRC}/tree/*.js\
+	      ${SRC}/tree.js\
+	      build/amd-anon.js >> ${NODE}
+	@@echo "})();" >> ${NODE}
+	@@echo ${NODE} built.
 
 rhino:
 	@@mkdir -p dist
